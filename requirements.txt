@@ -1,0 +1,5 @@
+requests 
+python-dotenv
+# optional:
+azure-identity
+azure-keyvault-secrets
