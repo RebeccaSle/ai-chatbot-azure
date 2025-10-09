@@ -23,3 +23,5 @@
 
 6. Error handling
 - Simulate missing API key (move .env) and run => expect clear error message
+
+## this is a simple test demo to try locally 
