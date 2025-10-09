@@ -18,7 +18,7 @@ missing = [n for n, v in [
 ] if not v]
 
 if missing:
-    print(f"(error) Missing required env vars: {', '.join(missing)}. Please set them in .env (don’t commit this file).")
+    print(f"(error) Missing required env vars: {', '.join(missing)}")
     sys.exit(1)
 
 BASE_URL = f"{AZURE_ENDPOINT.rstrip('/')}/openai/deployments/{DEPLOYMENT}/chat/completions?api-version={API_VERSION}"
@@ -33,7 +33,7 @@ SYSTEM_PROMPT = {
     "content": "You are a helpful assistant. Keep answers concise and friendly."
 }
 
-
+# 1.0 temp generated more creative answers, i set it to safety value 
 def send_messages(messages, max_tokens=512, temperature=0.2):
     """Send a chat request to Azure OpenAI and handle errors safely."""
     payload = {
@@ -50,16 +50,16 @@ def send_messages(messages, max_tokens=512, temperature=0.2):
         if resp.status_code != 200:
             code = data.get("error", {}).get("code", "")
             if code in ["content_filter", "ResponsibleAIPolicyViolation"]:
-                return "Sorry — I can’t help with that request."
-            return "Sorry — something went wrong with the request."
+                return "Sorry I can’t help with that request."
+            return "Sorry something went wrong with the request."
 
         # success 
         return data["choices"][0]["message"]["content"]
-
+        # exceptions 
     except requests.exceptions.RequestException:
-        return "Sorry — network error or bad request."
+        return "Sorry network error or bad request."
     except Exception:
-        return "Sorry — unexpected error occurred."
+        return "Sorry unexpected error occurred."
 
 
 def chat_loop():
