@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Chatbot</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <h2>AI Cooking Chatbot</h2>
+
+    <div class="controls">
+      <button id="new-session-btn">New Chat</button>
+      <select id="session-select">
+        <option value="">-- Load Previous Chat --</option>
+      </select>
+    </div>
+
+    <div id="chat-box"></div>
+
+    <div class="input-container">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Ask me anything about cooking..."
+      />
+      <button id="send-btn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    let sessionId = null;
+    const chatBox = document.getElementById("chat-box");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const sessionSelect = document.getElementById("session-select");
+    const newChatBtn = document.getElementById("new-session-btn");
+
+    async function fetchJSON(url, options) {
+      const res = await fetch(url, options);
+      return res.json();
+    }
+
+    async function loadSessions() {
+      const data = await fetchJSON("/sessions");
+      sessionSelect.innerHTML = '<option value="">-- Load Previous Chat --</option>';
+      data.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = `${s.id.slice(0,8)}... (Updated: ${new Date(s.lastUpdated).toLocaleString()})`;
+        sessionSelect.appendChild(opt);
+      });
+    }
+
+    async function loadSessionHistory(id) {
+      const data = await fetchJSON(`/history/${id}`);
+      chatBox.innerHTML = "";
+      data.messages.forEach(m => appendMessage(m.role, m.content));
+      sessionId = id;
+      appendMessage("assistant", "Resumed your cooking chat!");
+    }
+
+    async function newChat() {
+      const data = await fetchJSON("/create_session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      sessionId = data.session_id;
+      chatBox.innerHTML = "";
+      appendMessage("assistant", " New cooking chat! What would you like to cook today?");
+      await loadSessions();
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+      appendMessage("user", message);
+      userInput.value = "";
+
+      const data = await fetchJSON("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId, message })
+      });
+
+      sessionId = data.session_id;
+      appendMessage("assistant", data.reply);
+    }
+
+    function appendMessage(role, content) {
+      const msg = document.createElement("div");
+      msg.className = "message " + role;
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (role === "user" ? "user-bubble" : "assistant-bubble");
+      bubble.textContent = content;
+
+      msg.appendChild(bubble);
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+    newChatBtn.addEventListener("click", newChat);
+    sessionSelect.addEventListener("change", e => { if (e.target.value) loadSessionHistory(e.target.value); });
+
+    window.onload = async () => {
+      await loadSessions();
+      await newChat();
+    };
+  </script>
+</body>
+</html>

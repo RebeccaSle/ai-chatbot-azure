@@ -1,8 +1,8 @@
 ## Overview
-This document describes the initial architecture for the Azure AI Chatbot (Lab 1). The system provides a minimal conversational flow:
+This document describes the initial architecture for the Azure AI Chatbot (Lab 1+2). The system provides a minimal conversational flow:
 **User → Python Application → Azure OpenAI (gpt-4o) → Response → User**.
 
-To include later on RAG, semantic search, CI/CD, insights ....
+To include later on CI/CD, insights ....
 
 - **User**
   - Interaction: CLI 
