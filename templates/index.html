@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="chat-container">
-    <h2>AI Cooking Chatbot</h2>
+    <h2>AI Chatbot</h2>
 
     <div class="controls">
       <button id="new-session-btn">New Chat</button>
@@ -23,7 +23,7 @@
       <input
         type="text"
         id="user-input"
-        placeholder="Ask me anything about cooking..."
+        placeholder="Ask me anything ..."
       />
       <button id="send-btn">Send</button>
     </div>
@@ -58,7 +58,7 @@
       chatBox.innerHTML = "";
       data.messages.forEach(m => appendMessage(m.role, m.content));
       sessionId = id;
-      appendMessage("assistant", "Resumed your cooking chat!");
+      appendMessage("assistant", "Resumed your chat!");
     }
 
     async function newChat() {
@@ -69,7 +69,7 @@
 
       sessionId = data.session_id;
       chatBox.innerHTML = "";
-      appendMessage("assistant", " New cooking chat! What would you like to cook today?");
+      appendMessage("assistant", " New chat! What would you need help with?");
       await loadSessions();
     }
 
