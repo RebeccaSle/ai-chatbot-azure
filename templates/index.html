@@ -28,6 +28,7 @@
       <button id="send-btn">Send</button>
     </div>
   </div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <script>
     let sessionId = null;
@@ -95,12 +96,19 @@
 
       const bubble = document.createElement("div");
       bubble.className = "bubble " + (role === "user" ? "user-bubble" : "assistant-bubble");
-      bubble.textContent = content;
 
-      msg.appendChild(bubble);
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+      // ✅ Render Markdown as HTML for assistant messages
+      if (role === "assistant") {
+        bubble.innerHTML = marked.parse(content);
+      } else {
+        bubble.textContent = content;
+      }
+
+    msg.appendChild(bubble);
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
 
     sendBtn.addEventListener("click", sendMessage);
     userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
